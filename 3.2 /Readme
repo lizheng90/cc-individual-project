@@ -1,0 +1,6 @@
+Readme
+
+1.	Explore the advantages and disadvantages of using a single MySQL server
+2.	Explore the advantages and disadvantages of using a replicated MySQL server
+3.	Explore the advantages and disadvantages of using a sharded MySQL server
+4.	Explore the advantages and disadvantages of using a NoSQL datastore (HBase)

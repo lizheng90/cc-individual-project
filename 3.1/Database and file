@@ -1,0 +1,12 @@
+database and file
+
+
+1 Databases can handle querying tasks, so you don't have to walk over files manually. Databases can handle very complicated queries.
+2 Databases can handle indexing tasks, so if tasks like get record with id = x can be VERY fast
+3 Databases can handle multiprocess/multithreaded access.
+4 Databases can handle access from network
+5 Databases can watch for data integrity
+6 Databases can update data easily (see 1) )
+7 Databases are reliable
+8 Databases can handle transactions and concurrent access
+9 Databases + ORMs let you manipulate data in very programmer friendly way.

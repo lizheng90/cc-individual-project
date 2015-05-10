@@ -1,0 +1,100 @@
+Q1
+sudo su
+mkfs.ext4 /dev/xvdf
+mkdir /storage/mountpoint
+mount /dev/xvdf /storage/mountpoint
+cd /storage/mountpoint
+/home/ubuntu/sysbench-0.5/sysbench/sysbench --test=fileio --file-total-size=100G prepare
+sysbench --test=fileio --file-total-size=100G --file-test-mode=rndrw --max-time=300 --max-requests=0 run
+sysbench --test=fileio --file-total-size=100G --file-test-mode=rndrw --max-time=300 --max-requests=0 run
+sysbench --test=fileio --file-total-size=100G --file-test-mode=rndrw --max-time=300 --max-requests=0 run
+
+Q2
+sudo su
+mkfs.ext4 /dev/xvdf
+mkdir /storage/mountpoint
+mount /dev/xvdf /storage/mountpoint
+cd /storage/mountpoint
+/home/ubuntu/sysbench-0.5/sysbench/sysbench --test=fileio --file-total-size=100G prepare
+sysbench --test=fileio --file-total-size=100G --file-test-mode=rndrw --max-time=300 --max-requests=0 run
+sysbench --test=fileio --file-total-size=100G --file-test-mode=rndrw --max-time=300 --max-requests=0 run
+sysbench --test=fileio --file-total-size=100G --file-test-mode=rndrw --max-time=300 --max-requests=0 run
+
+
+
+
+
+
+Q9
+sudo su
+mkfs.ext4 /dev/xvdf
+mkdir /storage/mountpoint
+mount /dev/xvdf /storage/mountpoint
+cd /storage/mountpoint
+exit
+sudo cp -a /home/mysql_backup/* .
+sudo chown mysql:mysql /storage/mountpoint
+sudo cp -R /var/lib/mysql/ /home/mysql_backup/
+cd ~/sysbench-0.5/sysbench/
+export RUN_NAME=myRun1
+export MYSQL_SERVER=localhost
+
+service mysql stop
+mount --bind /storage/mountpoint /var/lib/mysql
+service mysql start
+./sysbench --test=tests/db/oltp.lua --mysql-host=$MYSQL_SERVER --mysql-user=sysbench --mysql-password=project3 --oltp-table-size=5000000 --num-threads=16 --max-requests=0 --max-time=300 --report-interval=5 --oltp-read-only=on run | tee $RUN_NAME.out
+
+export RUN_NAME=myRun2
+./sysbench --test=tests/db/oltp.lua --mysql-host=$MYSQL_SERVER --mysql-user=sysbench --mysql-password=project3 --oltp-table-size=5000000 --num-threads=16 --max-requests=0 --max-time=300 --report-interval=5 --oltp-read-only=on run | tee $RUN_NAME.out
+
+export RUN_NAME=myRun3
+./sysbench --test=tests/db/oltp.lua --mysql-host=$MYSQL_SERVER --mysql-user=sysbench --mysql-password=project3 --oltp-table-size=5000000 --num-threads=16 --max-requests=0 --max-time=300 --report-interval=5 --oltp-read-only=on run | tee $RUN_NAME.out
+
+
+Q12
+on YCSB: 
+vim records.props
+recordcount=1000000
+insertstart=0
+
+on each core instance:
+sudo su
+mkfs.ext4 /dev/xvdf
+mkdir /mnt/ebs1
+mount /dev/xvdf /mnt/ebs1
+cd /mnt/ebs1
+chown -R hadoop:hadoop /mnt/ebs1
+vim /home/hadoop/conf/hdfs-site.xml
+Locate the property dfs.data.dir
+Change the value of the property to /mnt/ebs1
+/etc/init.d/hadoop-datanode restart
+
+on master instance:
+~/bin/hadoop namenode -format
+hadoop dfsadmin -report
+
+on each core instance:
+sudo /etc/init.d/hbase-regionserver restart
+
+on master instance:
+sudo /etc/init.d/hbase-master restart
+hbase org.apache.hadoop.hbase.util.RegionSplitter usertable -c 200 -f family
+
+on YCSB:
+Edit the ycsb0.1.4/hbase-binding/conf/hbase-site.xml to specify the relevant fields of MASTER,ROOTDIR and ZOOKEEPER. They must all be set to the address of the EMR/HBase master node.
+time bin/ycsb load hbase -p columnfamily=family -P workloads/workloada -P records.props -threads 50 -s 1>  jiatel_hbase_summary_file_loaddata  2> jiatel_hbase_results_file_loaddata
+
+time bin/ycsb run hbase -p columnfamily=family -P workloads/workloada -p operationcount=200000 -P records.props -threads 50 -s  -target 800 1> jiatel_hbase_summary_file_800 2> jiatel_hbase_results_file_800
+
+time bin/ycsb run hbase -p columnfamily=family -P workloads/workloada -p operationcount=200000 -P records.props -threads 50 -s  -target 800 1> jiatel_hbase_summary_file_800 2> jiatel_hbase_results_file_800
+
+time bin/ycsb run hbase -p columnfamily=family -P workloads/workloada -p operationcount=200000 -P records.props -threads 50 -s  -target 800 1> jiatel_hbase_summary_file_800 2> jiatel_hbase_results_file_800
+
+
+time bin/ycsb run hbase -p columnfamily=family -P workloads/workloada -p operationcount=200000 -P records.props -threads 50 -s  -target 1600 1> jiatel_hbase_summary_file_1600 2> jiatel_hbase_results_file_1600
+
+time bin/ycsb run hbase -p columnfamily=family -P workloads/workloada -p operationcount=200000 -P records.props -threads 50 -s  -target 1600 1> jiatel_hbase_summary_file_1600 2> jiatel_hbase_results_file_1600
+
+time bin/ycsb run hbase -p columnfamily=family -P workloads/workloada -p operationcount=200000 -P records.props -threads 50 -s  -target 1600 1> jiatel_hbase_summary_file_1600 2> jiatel_hbase_results_file_1600
+
+Run the benchmark process for both types of EBS - SSD and Magnetic Disk
